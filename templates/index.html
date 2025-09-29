@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Registration</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #71b7e6, #9b59b6);
+            display: flex; justify-content: center; align-items: flex-start;
+            min-height: 100vh; margin: 0; padding: 40px 20px; box-sizing: border-box;
+        }
+        .container {
+            max-width: 600px; width: 100%; background-color: #fff; padding: 30px 40px;
+            border-radius: 15px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+        h1, h2 { text-align: center; color: #333; }
+        h2 { margin-top: 30px; border-bottom: 2px solid #f2f2f2; padding-bottom: 10px; }
+        .input-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 400; color: #555; }
+        input[type="text"], input[type="email"], input[type="tel"] {
+            width: 100%; padding: 12px 15px; border: 1px solid #ccc;
+            border-radius: 8px; font-size: 1rem; box-sizing: border-box;
+        }
+        .submit-btn, .add-member-btn, .remove-member-btn {
+            width: 100%; padding: 12px; border: none; border-radius: 8px;
+            color: #fff; font-size: 1.1em; font-weight: 600; cursor: pointer;
+            transition: background 0.3s ease; margin-top: 10px;
+        }
+        .submit-btn { background: linear-gradient(135deg, #71b7e6, #9b59b6); }
+        .add-member-btn { background-color: #28a745; }
+        .remove-member-btn { background-color: #dc3545; }
+        .member-entry {
+            padding: 15px; border: 1px dashed #ccc; border-radius: 8px;
+            margin-top: 15px; display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end;
+        }
+        .member-field { flex: 1; min-width: 200px; }
+        .payment-options { display: flex; gap: 20px; justify-content: center; margin-bottom: 20px; }
+        .payment-total {
+            text-align: center; font-size: 1.5em; font-weight: 600;
+            color: #333; background-color: #f8f9fa; padding: 15px;
+            border-radius: 8px; margin-top: 20px;
+        }
+        .payment-breakdown {
+            font-size: 0.8rem;
+            font-weight: 400;
+            color: #6c757d;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Event Registration</h1>
+        <form action="http://127.0.0.1:5000/register" method="POST">
+            <h2>Your Information</h2>
+            <div class="input-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="input-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="input-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone">
+            </div>
+            <div class="input-group">
+                <label for="address">Address</label>
+                <input type="text" id="address" name="address">
+            </div>
+
+            <h2>Members Coming With You</h2>
+            <div id="members-container"></div>
+            <button type="button" class="add-member-btn" onclick="addMember()">+ Add Member</button>
+
+            <h2>Payment Details</h2>
+            <div class="payment-options">
+                <label><input type="radio" name="payment_method" value="Cash" required checked> Pay with Cash</label>
+                <label><input type="radio" name="payment_method" value="Online"> Pay Online</label>
+            </div>
+            <div class="payment-total">
+                <div class="payment-breakdown" id="payment-breakdown">For 1 person: You</div>
+                Total Amount: ₹<span id="total-payment">100</span>
+            </div>
+
+            <hr style="margin: 30px 0; border: 1px solid #eee;">
+            <button type="submit" class="submit-btn">Register Now</button>
+        </form>
+    </div>
+
+    <script>
+        const PRICE_PER_PERSON = 100;
+
+        function addMember() {
+            const container = document.getElementById('members-container');
+            const memberDiv = document.createElement('div');
+            memberDiv.className = 'member-entry';
+            memberDiv.innerHTML = `
+                <div class="member-field">
+                    <label>Member Name</label>
+                    <input type="text" name="member_name" required>
+                </div>
+                <div class="member-field">
+                    <label>Member Phone</label>
+                    <input type="tel" name="member_phone">
+                </div>
+                <button type="button" class="remove-member-btn" onclick="removeMember(this)">Remove</button>
+            `;
+            container.appendChild(memberDiv);
+            updateTotal();
+        }
+
+        function removeMember(button) {
+            button.parentElement.remove();
+            updateTotal();
+        }
+
+        function updateTotal() {
+            const memberCount = document.getElementsByClassName('member-entry').length;
+            const totalPeople = 1 + memberCount; // Main registrant + members
+            const totalPayment = totalPeople * PRICE_PER_PERSON;
+            
+            document.getElementById('total-payment').innerText = totalPayment;
+
+            const breakdownDiv = document.getElementById('payment-breakdown');
+            let breakdownText = `For ${totalPeople} person${totalPeople > 1 ? 's' : ''}: `;
+            if (memberCount > 0) {
+                breakdownText += `You + ${memberCount} member${memberCount !== 1 ? 's' : ''}`;
+            } else {
+                breakdownText += `You`;
+            }
+            breakdownDiv.innerText = breakdownText;
+        }
+    </script>
+</body>
+</html>
+
